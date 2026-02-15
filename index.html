@@ -1,699 +1,712 @@
-
-<html> 
-a.custom-tumblr-link {
-display: inline !important;
-visibility: visible !important;
-opacity: 1 !important;
-pointer-events: auto !important;
-color: blue;
-/* or black if you want */
-text-decoration: underline;
-/* optional */
-}
-iframe.tmblr-iframe,
-.tmblr-iframe,
-#tumblr_controls,
-.tumblr_controls,
-.tumblr_blog,
-.tumblr_credit,
-.tumblr-follow-button,
-.tumblr-share-button,
-a[href*="tumblr.com"]:not(.custom-tumblr-link),
-a[href*="tmblr.co"]:not(.custom-tumblr-link) {
-display: none !important;
-visibility: hidden !important;
-opacity: 0 !important;
-pointer-events: none !important;
-}
-html,
-body {
-height: 100%;
-overflow: hidden;
-}
-body::after {
-content: "";
-display: block;
-height: 120vh;
-}
-:root {
---frame-thickness: 55px;
-/* Keeping the same thickness for interaction area */
---border-color: #000000;
---bg-color: #ffffff;
---text-color: #0000FF;
---frame-inset: 20px;
-}
-body {
-margin: 0;
-padding: 0;
-font-family: 'helvetica';
-color: var(--text-color);
-overflow: hidden;
-height: 100vh;
-display: flex;
-justify-content: center;
-align-items: center;
-background-color: var(--bg-color);
-}
-/* Typography */
-body,
-a,
-p,
-h1,
-h2,
-h3,
-.label,
-.caption,
-div {
-color: black;
-text-decoration: none;
-}
-a:visited {
-color: black;
-}
-/* FRAME LINKS: always black */
-.frame-side,
-.frame-side .label,
-.frame-side:visited,
-.frame-side .label:visited {
-color: black !important;
-}
-/*
-FRAME STYLING (MINIMAL BLACK LINES)
-We remove the wood texture and replace it with simple black borders.
-*/
-.frame-side {
-position: fixed;
-background-color: white;
-/* No Border - lines are drawn by visual layer */
-border: none;
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 1000;
-box-sizing: border-box;
-}
-/*
-Visual Layer for Diagonal Joints
-Since clip-path cuts off borders at the diagonals, we draw specific lines.
-*/
-.frame-visuals {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-pointer-events: none;
-z-index: 1002;
-/* Above frame sides */
-}
-.outer-rect {
-position: absolute;
-top: var(--frame-inset);
-left: var(--frame-inset);
-right: var(--frame-inset);
-bottom: var(--frame-inset);
-border: 2px solid black;
-}
-.inner-rect {
-position: absolute;
-top: calc(var(--frame-inset) + var(--frame-thickness));
-left: calc(var(--frame-inset) + var(--frame-thickness));
-right: calc(var(--frame-inset) + var(--frame-thickness));
-bottom: calc(var(--frame-inset) + var(--frame-thickness));
-border: 2px solid black;
-}
-.corner-line {
-position: absolute;
-background-color: black;
-height: 2px;
-/*
-Width = distance from outer corner to inner corner = thickness * sqrt(2)
-55 * 1.414 = 77.78px.
-Set to 77.5px to bridge the gap perfectly without overshooting visually.
-*/
-width: 77.8px;
-transform-origin: 0 50%;
-}
-/*
-Positioning corners at the "inset" point where bars meet.
-*/
-.corner-tl {
-top: var(--frame-inset);
-left: var(--frame-inset);
-transform: rotate(45deg);
-}
-.corner-tr {
-top: var(--frame-inset);
-left: calc(100% - var(--frame-inset));
-transform: rotate(135deg);
-}
-.corner-bl {
-bottom: var(--frame-inset);
-left: var(--frame-inset);
-transform: rotate(-45deg);
-}
-.corner-br {
-bottom: var(--frame-inset);
-left: calc(100% - var(--frame-inset));
-transform: rotate(-135deg);
-}
-/* TOP */
-.frame-top {
-top: var(--frame-inset);
-left: var(--frame-inset);
-right: var(--frame-inset);
-height: var(--frame-thickness);
-/* Mitered visual using clip-path */
-clip-path: polygon(0% 0%, 100% 0%, calc(100% - var(--frame-thickness) + 1px) 100%, calc(var(--frame-thickness) - 1px) 100%);
-}
-/* BOTTOM */
-.frame-bottom {
-bottom: var(--frame-inset);
-left: var(--frame-inset);
-right: var(--frame-inset);
-height: var(--frame-thickness);
-clip-path: polygon(calc(var(--frame-thickness) - 1px) 0%, calc(100% - var(--frame-thickness) + 1px) 0%, 100% 100%, 0% 100%);
-}
-/* LEFT */
-.frame-left {
-top: var(--frame-inset);
-bottom: var(--frame-inset);
-left: var(--frame-inset);
-width: var(--frame-thickness);
-clip-path: polygon(0% 0%, 100% calc(var(--frame-thickness) - 1px), 100% calc(100% - var(--frame-thickness) + 1px), 0% 100%);
-}
-/* RIGHT */
-.frame-right {
-top: var(--frame-inset);
-bottom: var(--frame-inset);
-right: var(--frame-inset);
-width: var(--frame-thickness);
-clip-path: polygon(0% calc(var(--frame-thickness) - 1px), 100% 0%, 100% 100%, 0% calc(100% - var(--frame-thickness) + 1px));
-}
-/* Label Styling */
-.frame-side .label {
-color: black !important;
-white-space: nowrap;
-/* ← key change */
-max-width: none;
-/* ← remove artificial constraint */
-line-height: 1;
-text-align: center;
-position: relative;
-z-index: 2;
-opacity: 0;
-transition: opacity 0.3s ease;
-}
-.frame-side:hover .label {
-opacity: 1;
-}
-.frame-side:hover {
-background-color: #f0f0f0;
-/* Slight grey on hover to indicate clickable */
-}
-.frame-left .label {
-transform: rotate(-90deg);
-}
-.frame-right .label {
-transform: rotate(90deg);
-}
-/* Content Styling */
-.content {
-font-size: 25px;
-position: relative;
-text-align: center;
-/* Adjusted width to account for frame */
-width: calc(100% - 2 * (var(--frame-inset) + var(--frame-thickness) + 20px));
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-/* Content Typography: Baskerville in Black */
-font-family: 'Baskerville', 'Times New Roman', serif;
-color: black;
-}
-/* Ensure ALL text in content is black and NO underlines */
-.content p,
-.content h1,
-.content h2,
-.content h3,
-.content div,
-.content a {
-color: black;
-text-decoration: none;
-}
-/* Links inside content remain black (no blue), no underline as requested */
-.content {
-position: absolute;
-top: calc(var(--frame-inset) + var(--frame-thickness));
-left: calc(var(--frame-inset) + var(--frame-thickness));
-right: calc(var(--frame-inset) + var(--frame-thickness));
-bottom: calc(var(--frame-inset) + var(--frame-thickness));
-overflow: hidden;
-display: flex;
-align-items: stretch;
-justify-content: stretch;
-font-family: 'helvetica', 'Times New Roman', serif;
-color: black;
-}
-.posts-wrapper {
-position: relative;
-z-index: 20;
-width: 100%;
-height: 100%;
-display: flex;
-}
-.post {
-width: 100%;
-height: 100%;
-padding: 40px;
-box-sizing: border-box;
-background: white;
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 40px;
-align-items: stretch;
-pointer-events: auto;
-}
-/* SPLIT LAYOUT TEXT SCROLL */
-.post.split .text-post {
-height: 100%;
-overflow-y: auto;
-padding-right: 20px;
-text-align: left;
-scrollbar-width: none;
-}
-.post.split .text-post::-webkit-scrollbar {
-display: none;
-/* Chrome / Safari */
-}
-.post.split .image-viewer {
-width: 100%;
-height: 100%;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.post.split .image-viewer img {
-max-width: 100%;
-max-height: 100%;
-object-fit: contain;
-}
-/* FULL IMAGE */
-.post.image {
-display: flex;
-align-items: center;
-justify-content: center;
-padding: 40px;
-height: 100%;
-}
-.post.image .image-viewer {
-width: 100%;
-height: 100%;
-}
-.post.image img {
-width: 100%;
-height: 100%;
-object-fit: contain;
-}
-.post.image a {
-display: block;
-width: 100%;
-height: 100%;
-}
-.post.image a img {
-width: 100%;
-height: 100%;
-object-fit: contain;
-}
-/* FULL TEXT */
-.post.text {
-display: block;
-padding: 60px;
-text-align: left;
-font-size: 35px;
-/* ← adjust this */
-line-height: 1.5;
-/* optional but strongly recommended */
-}
-.post.text .text-post {
-height: 100%;
-overflow-y: auto;
-scrollbar-width: none;
-}
-.post.text .text-post::-webkit-scrollbar {
-display: none;
-}
-/* FULL VIDEO */
-.post.video {
-display: flex;
-align-items: center;
-justify-content: center;
-padding: 40px;
-height: 100%;
-}
-.post.video .video-viewer {
-width: 100%;
-height: 100%;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.post.video iframe {
-max-width: 100%;
-max-height: 100%;
-/* Keep aspect ratio if possible, but contained */
-aspect-ratio: 16 / 9;
-width: 100%;
-height: auto;
-}
-/* If the screen is too wide (wider than 16:9), height is 100% and width auto */
-@media (min-aspect-ratio: 16/9) {
-.post.video iframe {
-height: 100%;
-width: auto;
-}
-}
-</style><link rel="alternate" href="android-app://com.tumblr/tumblr/x-callback-url/blog?blogName=kunsthausbaselland" /><link rel="alternate" href="ios-app://305343404/tumblr/x-callback-url/blog?blogName=kunsthausbaselland" /><script
-defer
-type="application/javascript"
-id="bilmur"
-data-provider="tumblr.com"
-data-service="blognetwork"
-data-customproperties='{"theme": ""}'
-nonce="garZft97xpp4uZUMz9nwbxi2Y"
-src="https://s0.wp.com/wp-content/js/bilmur.min.js?m=202606"
-></script><script src="https://assets.tumblr.com/assets/scripts/tumblelog_post_message_queue.js?_v=a8fadfa499d8cb7c3f8eefdf0b1adfdd"></script><link rel="stylesheet" type="text/css" href="https://assets.tumblr.com/fonts/gibson/stylesheet.css?v=3"><!-- BEGIN TUMBLR FACEBOOK OPENGRAPH TAGS --><!-- If you'd like to specify your own Open Graph tags, define the og:url and og:title tags in your theme's HTML. --><!-- Read more: http://ogp.me/ --><meta property="fb:app_id" content="48119224995" /><meta property="og:site_name" content="Tumblr" /><meta property="og:title" content="frameframetest" /><meta property="og:url" content="https://kunsthausbaselland.com/?og=1" /><meta property="og:description" content="" /><meta property="og:type" content="profile" /><meta property="og:image" content="https://assets.tumblr.com/images/default_avatar/diamond_pink_purple_128.png" /><meta property="al:ios:url" content="tumblr://x-callback-url/blog?blogName=kunsthausbaselland" /><meta property="al:ios:app_name" content="Tumblr" /><meta property="al:ios:app_store_id" content="305343404" /><meta property="al:android:url" content="tumblr://x-callback-url/blog?blogName=kunsthausbaselland" /><meta property="al:android:app_name" content="Tumblr" /><meta property="al:android:package" content="com.tumblr" /><!-- END TUMBLR FACEBOOK OPENGRAPH TAGS --><!-- TWITTER TAGS --><meta charset="utf-8"><meta name="twitter:site" content="tumblr" /><meta name="twitter:card" content="summary" /><meta name="twitter:description" content="" /><meta name="twitter:title" content="frameframetest" /><meta name="twitter:app:name:iphone" content="Tumblr" /><meta name="twitter:app:name:ipad" content="Tumblr" /><meta name="twitter:app:name:googleplay" content="Tumblr" /><meta name="twitter:app:id:iphone" content="305343404" /><meta name="twitter:app:id:ipad" content="305343404" /><meta name="twitter:app:id:googleplay" content="com.tumblr" /><meta name="twitter:app:url:iphone" content="tumblr://x-callback-url/blog?blogName=kunsthausbaselland&amp;referrer=twitter-cards" /><meta name="twitter:app:url:ipad" content="tumblr://x-callback-url/blog?blogName=kunsthausbaselland&amp;referrer=twitter-cards" /><meta name="twitter:app:url:googleplay" content="tumblr://x-callback-url/blog?blogName=kunsthausbaselland&amp;referrer=twitter-cards" /><link rel="canonical" href="https://kunsthausbaselland.com" /></head><body><!-- Visual Layer (Draws the diagonal lines) --><div class="frame-visuals"><!-- New Wireframe Rectangles --><div class="outer-rect"></div><div class="inner-rect"></div><!-- Diagonal Joints --><div class="corner-line corner-tl"></div><div class="corner-line corner-tr"></div><div class="corner-line corner-bl"></div><div class="corner-line corner-br"></div></div><!-- Interaction Layer (Clickable Zones) --><a href="#" class="frame-side frame-top" id="frame-top"><span class="label">Loading...</span></a><a href="#" class="frame-side frame-right" id="frame-right"><span class="label">Loading...</span></a><a href="#" class="frame-side frame-bottom" id="frame-bottom"><span class="label">Loading...</span></a><a href="#" class="frame-side frame-left" id="frame-left"><span class="label">Loading...</span></a><!-- Main Content --><main class="content"><div class="posts-wrapper" id="dynamic-content"><!-- Content will be injected here by JS --></div></main><script>
-// --- Random Navigation System (COPIED FROM ORIGINAL) ---
-const pages = [
-// --- USER VIDEO EXAMPLE (PLACEHOLDER) ---
-// Replace the 'embed' string with your YouTube embed code
-{
-id: 'p_video',
-title: 'Tao Lin - The next night we ate whale',
-layout: 'video',
-embed: '<iframe width="560" height="315" src="https://www.youtube.com/embed/QjcOK2T0lPo?si=EXAMPLE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
-},
-{
-id: 'p1',
-title: 'Ludwig Wittgenstein — Preface',
-layout: 'text',
-content: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kunsthaus Baselland</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        /* --- HIDE TUMBLR UI / LINKS --- */
+        a.custom-tumblr-link {
+            display: inline !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            color: blue;
+            /* or black if you want */
+            text-decoration: underline;
+            /* optional */
+        }
+        iframe.tmblr-iframe,
+        .tmblr-iframe,
+        #tumblr_controls,
+        .tumblr_controls,
+        .tumblr_blog,
+        .tumblr_credit,
+        .tumblr-follow-button,
+        .tumblr-share-button,
+        a[href*="tumblr.com"]:not(.custom-tumblr-link),
+        a[href*="tmblr.co"]:not(.custom-tumblr-link) {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body::after {
+            content: "";
+            display: block;
+            height: 120vh;
+        }
+        :root {
+            --frame-thickness: 55px;
+            /* Keeping the same thickness for interaction area */
+            --border-color: #000000;
+            --bg-color: #ffffff;
+            --text-color: #0000FF;
+            --frame-inset: 20px;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'helvetica';
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+        }
+        /* Typography */
+        body,
+        a,
+        p,
+        h1,
+        h2,
+        h3,
+        .label,
+        .caption,
+        div {
+            color: black;
+            text-decoration: none;
+        }
+        a:visited {
+            color: black;
+        }
+        /* FRAME LINKS: always black */
+        .frame-side,
+        .frame-side .label,
+        .frame-side:visited,
+        .frame-side .label:visited {
+            color: black !important;
+        }
+        /* 
+           FRAME STYLING (MINIMAL BLACK LINES)
+           We remove the wood texture and replace it with simple black borders.
+        */
+        .frame-side {
+            position: fixed;
+            background-color: white;
+            /* No Border - lines are drawn by visual layer */
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        /* 
+           Visual Layer for Diagonal Joints 
+           Since clip-path cuts off borders at the diagonals, we draw specific lines.
+        */
+        .frame-visuals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1002;
+            /* Above frame sides */
+        }
+        .outer-rect {
+            position: absolute;
+            top: var(--frame-inset);
+            left: var(--frame-inset);
+            right: var(--frame-inset);
+            bottom: var(--frame-inset);
+            border: 2px solid black;
+        }
+        .inner-rect {
+            position: absolute;
+            top: calc(var(--frame-inset) + var(--frame-thickness));
+            left: calc(var(--frame-inset) + var(--frame-thickness));
+            right: calc(var(--frame-inset) + var(--frame-thickness));
+            bottom: calc(var(--frame-inset) + var(--frame-thickness));
+            border: 2px solid black;
+        }
+        .corner-line {
+            position: absolute;
+            background-color: black;
+            height: 2px;
+            /* 
+               Width = distance from outer corner to inner corner = thickness * sqrt(2) 
+               55 * 1.414 = 77.78px.
+               Set to 77.5px to bridge the gap perfectly without overshooting visually.
+            */
+            width: 77.8px;
+            transform-origin: 0 50%;
+        }
+        /* 
+           Positioning corners at the "inset" point where bars meet.
+        */
+        .corner-tl {
+            top: var(--frame-inset);
+            left: var(--frame-inset);
+            transform: rotate(45deg);
+        }
+        .corner-tr {
+            top: var(--frame-inset);
+            left: calc(100% - var(--frame-inset));
+            transform: rotate(135deg);
+        }
+        .corner-bl {
+            bottom: var(--frame-inset);
+            left: var(--frame-inset);
+            transform: rotate(-45deg);
+        }
+        .corner-br {
+            bottom: var(--frame-inset);
+            left: calc(100% - var(--frame-inset));
+            transform: rotate(-135deg);
+        }
+        /* TOP */
+        .frame-top {
+            top: var(--frame-inset);
+            left: var(--frame-inset);
+            right: var(--frame-inset);
+            height: var(--frame-thickness);
+            /* Mitered visual using clip-path */
+            clip-path: polygon(0% 0%, 100% 0%, calc(100% - var(--frame-thickness) + 1px) 100%, calc(var(--frame-thickness) - 1px) 100%);
+        }
+        /* BOTTOM */
+        .frame-bottom {
+            bottom: var(--frame-inset);
+            left: var(--frame-inset);
+            right: var(--frame-inset);
+            height: var(--frame-thickness);
+            clip-path: polygon(calc(var(--frame-thickness) - 1px) 0%, calc(100% - var(--frame-thickness) + 1px) 0%, 100% 100%, 0% 100%);
+        }
+        /* LEFT */
+        .frame-left {
+            top: var(--frame-inset);
+            bottom: var(--frame-inset);
+            left: var(--frame-inset);
+            width: var(--frame-thickness);
+            clip-path: polygon(0% 0%, 100% calc(var(--frame-thickness) - 1px), 100% calc(100% - var(--frame-thickness) + 1px), 0% 100%);
+        }
+        /* RIGHT */
+        .frame-right {
+            top: var(--frame-inset);
+            bottom: var(--frame-inset);
+            right: var(--frame-inset);
+            width: var(--frame-thickness);
+            clip-path: polygon(0% calc(var(--frame-thickness) - 1px), 100% 0%, 100% 100%, 0% calc(100% - var(--frame-thickness) + 1px));
+        }
+        /* Label Styling */
+        .frame-side .label {
+            color: black !important;
+            white-space: nowrap;
+            /* ← key change */
+            max-width: none;
+            /* ← remove artificial constraint */
+            line-height: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .frame-side:hover .label {
+            opacity: 1;
+        }
+        .frame-side:hover {
+            background-color: #f0f0f0;
+            /* Slight grey on hover to indicate clickable */
+        }
+        .frame-left .label {
+            transform: rotate(-90deg);
+        }
+        .frame-right .label {
+            transform: rotate(90deg);
+        }
+        /* Content Styling */
+        .content {
+            font-size: 25px;
+            position: relative;
+            text-align: center;
+            /* Adjusted width to account for frame */
+            width: calc(100% - 2 * (var(--frame-inset) + var(--frame-thickness) + 20px));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Content Typography: Baskerville in Black */
+            font-family: 'Baskerville', 'Times New Roman', serif;
+            color: black;
+        }
+        /* Ensure ALL text in content is black and NO underlines */
+        .content p,
+        .content h1,
+        .content h2,
+        .content h3,
+        .content div,
+        .content a {
+            color: black;
+            text-decoration: none;
+        }
+        /* Links inside content remain black (no blue), no underline as requested */
+        .content {
+            position: absolute;
+            top: calc(var(--frame-inset) + var(--frame-thickness));
+            left: calc(var(--frame-inset) + var(--frame-thickness));
+            right: calc(var(--frame-inset) + var(--frame-thickness));
+            bottom: calc(var(--frame-inset) + var(--frame-thickness));
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            font-family: 'helvetica', 'Times New Roman', serif;
+            color: black;
+        }
+        .posts-wrapper {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+        .post {
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: stretch;
+            pointer-events: auto;
+        }
+        /* SPLIT LAYOUT TEXT SCROLL */
+        .post.split .text-post {
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 20px;
+            text-align: left;
+            scrollbar-width: none;
+        }
+        .post.split .text-post::-webkit-scrollbar {
+            display: none;
+            /* Chrome / Safari */
+        }
+        .post.split .image-viewer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .post.split .image-viewer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        /* FULL IMAGE */
+        .post.image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            height: 100%;
+        }
+        .post.image .image-viewer {
+            width: 100%;
+            height: 100%;
+        }
+        .post.image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .post.image a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .post.image a img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* FULL TEXT */
+        .post.text {
+            display: block;
+            padding: 60px;
+            text-align: left;
+            font-size: 35px;
+            /* ← adjust this */
+            line-height: 1.5;
+            /* optional but strongly recommended */
+        }
+        .post.text .text-post {
+            height: 100%;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .post.text .text-post::-webkit-scrollbar {
+            display: none;
+        }
+        /* FULL VIDEO */
+        .post.video {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            height: 100%;
+        }
+        .post.video .video-viewer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .post.video iframe {
+            max-width: 100%;
+            max-height: 100%;
+            /* Keep aspect ratio if possible, but contained */
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: auto;
+        }
+        /* If the screen is too wide (wider than 16:9), height is 100% and width auto */
+        @media (min-aspect-ratio: 16/9) {
+            .post.video iframe {
+                height: 100%;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Visual Layer (Draws the diagonal lines) -->
+    <div class="frame-visuals">
+        <!-- New Wireframe Rectangles -->
+        <div class="outer-rect"></div>
+        <div class="inner-rect"></div>
+        <!-- Diagonal Joints -->
+        <div class="corner-line corner-tl"></div>
+        <div class="corner-line corner-tr"></div>
+        <div class="corner-line corner-bl"></div>
+        <div class="corner-line corner-br"></div>
+    </div>
+    <!-- Interaction Layer (Clickable Zones) -->
+    <a href="#" class="frame-side frame-top" id="frame-top">
+        <span class="label">Loading...</span>
+    </a>
+    <a href="#" class="frame-side frame-right" id="frame-right">
+        <span class="label">Loading...</span>
+    </a>
+    <a href="#" class="frame-side frame-bottom" id="frame-bottom">
+        <span class="label">Loading...</span>
+    </a>
+    <a href="#" class="frame-side frame-left" id="frame-left">
+        <span class="label">Loading...</span>
+    </a>
+    <!-- Main Content -->
+    <main class="content">
+        <div class="posts-wrapper" id="dynamic-content">
+            <!-- Content will be injected here by JS -->
+        </div>
+    </main>
+    <script>
+        // --- Random Navigation System (COPIED FROM ORIGINAL) ---
+        const pages = [
+            // --- USER VIDEO EXAMPLE (PLACEHOLDER) ---
+            // Replace the 'embed' string with your YouTube embed code
+            {
+                id: 'p_video',
+                title: 'My Video Title',
+                layout: 'video',
+                embed: '<iframe width="560" height="315" src="https://www.youtube.com/embed/QjcOK2T0lPo?si=EXAMPLE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
+            },
+            {
+                id: 'p1',
+                title: 'Ludwig Wittgenstein — Preface',
+                layout: 'text',
+                content: `
 <p>
 "I have written down all these thoughts as remarks, short paragraphs, of which there is sometimes a fairly long chain about the same subject, while I sometimes make a sudden change, jumping from one topic to another. It was my intention at first to bring all this together in a book whose form I pictured differently at different times. But the essential thing was that the thoughts should proceed from one subject to another in a natural order and without breaks.
-</p><p>
+</p>
+<p>
 After several unsuccessful attempts to weld my results together into such a whole, I realized that I should never succeed. The best that I could write would never be more than philosophical remarks; my thoughts were soon crippled if I tried to force them on in any single direction against their natural inclination.
-</p><p>
+</p>
+<p>
 And this was, of course, connected with the very nature of the investigation. For this compels us to travel over a wide field of thought criss-cross in every direction."
-</p><p>
+</p>
+<p>
 "I should have liked to produce a good book. This has not come about, but the time is past in which I could improve it."
 </p>
-`
-},
-{
-id: 'p2',
-title: 'Michael Craig Martin – “the Magenta plinth room”',
-content: `
-<p>
-Michael Craig Martin had a project at a house where he changed all plinths to magenta.
-This is a kind of way to frame of course. I think he said he once decided that the whole
-graduation show at Goldsmiths was to be had with magenta walls, because pink or magenta
-make all other colours better.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.
-</p>
-`,
-images: [
-"https://i.imgur.com/5Hgaf92.jpeg",
-"https://i.imgur.com/gcqPjOH.jpg"
-]
-},
-{
-id: 'p3',
-title: 'Working out is modern couture',
-layout: 'text',
-content: `
+  `
+            },
+            {
+                id: 'p2',
+                title: 'Michael Craig Martin – “the Magenta plinth room”',
+                content: `
+    <p>
+      Michael Craig Martin had a project at a house where he changed all plinths to magenta.
+      This is a kind of way to frame of course. I think he said he once decided that the whole
+      graduation show at Goldsmiths was to be had with magenta walls, because pink or magenta
+      make all other colours better.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.Since then I have tried to notice pink in works to see who is using the pink trick.
+    </p>
+  `,
+                images: [
+                    "https://i.imgur.com/5Hgaf92.jpeg",
+                    "https://i.imgur.com/gcqPjOH.jpg"
+                ]
+            },
+            {
+                id: 'p3',
+                title: 'Working out is modern couture',
+                layout: 'text',
+                content: `
 <p>
 Rick Owens writes in <em>Harper’s Bazaar</em> in 2013:
-</p><p>
+</p>
+<p>
 “…At least once a day I mumble to myself, ‘A hundred years from now no one will care, so get over yourself.’”
-</p><p>
+</p>
+<p>
 In the same article he writes:
-</p><p>
+</p>
+<p>
 “It takes me minutes to dress—I've worn the same black outfit for years, like a priest. Or a prisoner. I can't imagine having to choose something that I might sour on later in the day. My vanity is pretty satisfied by the gym.”
-</p><p>
+</p>
+<p>
 A version of a quote which I see often:
-</p><p>
+</p>
+<p>
 “Working out is modern couture. No outfit is going to make you look or feel as good as having a fit body. Buy less clothing and go to the gym instead.”
-</p><p>
+</p>
+<p>
 For Rick Owens, the frame, which outside of painting means the body, the thing that holds, is a way to get over the self. I have often thought that the field of extended painting is this; painting wanting to get over itself.
-</p><p>
+</p>
+<p>
 It seems that the modernist “refusal” of the frame is in a sense a refusal to get over itself. Of course fashion has an advantage. Fashion believes no one will care in a hundred years. True or not.
 </p>
 `
-}
-,
-{
-id: 'p4',
-title: 'THE HOLE WORLD',
-layout: 'split',
-content: `
+            }
+            ,
+            {
+                id: 'p4',
+                title: 'THE HOLE WORLD',
+                layout: 'split',
+                content: `
 <p>
 My father would come home and tell me that he just had donuts and saved me the best part. He would signal a hole with his fingers and mean that the best part of the donut was the hole. This is dad joke, but I’m still not sure if this was meant as some sort of lesson. It is in a way a Koan. The donut without a hole is a Berliner and the hole without the donut is nothing.
-</p><p>
+</p>
+<p>
 Thinking of art as a donut, I wrote in an artist statement:
-</p><p>
+</p>
+<p>
 I do not mean to say all artistic positions are false, but rather that the point at their center cannot be thought or outlined, only intuited. Art functions like a donut; A hole that makes a whole with the pastry around it. Artistic activity is not saying the unsayable. It is saying what can be said in order to create a hole in the middle.
-</p><p>
+</p>
+<p>
 There’s an anti-magic trick where you hold up the palms of your hands towards the spectators saying “nothing here” then you clap and say “Gone”, as if you just made nothing disappear. Eating the pastry around the hole could be seen as a way to make nothing disappear.
-</p><p>
+</p>
+<p>
 Austrian artist and aphorist Heinz Frank wrote:
-</p><p>
+</p>
+<p>
 Nicht mit weniger mehr sondern mit allem nichts, tut not<br>
 &mdash; Heinz Frank
-</p><p>
+</p>
+<p>
 (Not with less more but with all nothing, is needed.)
-</p><p>
+</p>
+<p>
 If we make Nothing disappear it says:<br>
 Not with less more but with all&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;, is needed.
-</p><p>
+</p>
+<p>
 If we make more, all and nothing disappear:<br>
 Not with less&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but with&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;, is needed.
-</p><p>
+</p>
+<p>
 If we make more, needed, nothing, is, all and not disappear:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with less&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but with&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;, .
-</p><p>
+</p>
+<p>
 Heinz Frank died in 2020. All holes punched in his aphorism seem to leak the same substance. It feels to me as if it gives the same thing whatever words I keep or take away.
-</p><p>
+</p>
+<p>
 I think these are some of the things which led me to The Hole. They are meaningful to me now.
 </p>
 `,
-images: [
-"https://i.imgur.com/l4xg1eC.png",
-"https://i.imgur.com/RAA3sxi.png",
-"https://i.imgur.com/wOwoDc2.png",
-"https://i.imgur.com/g2kyGiM.png",
-"https://i.imgur.com/0ALtZyV.png"
-]
-},
-{
-id: 'p5',
-title: 'kaspar ludwig website',
-layout: 'image',
-link: 'https://Kasparludwig.tumblr.com/',
-images: ["https://i.imgur.com/28K0W8t.png"]
-},
-{
-id: 'p6',
-title: 'Maison Martin Margiela Photographed by Annie Leibovitz in 2008',
-layout: 'image',
-images: ["https://i.imgur.com/0EKmxDo.jpeg"]
-},
-{
-id: 'p7', title: 'martin kippenberger - per pasta ad astra',
-content: `
+                images: [
+                    "https://i.imgur.com/l4xg1eC.png",
+                    "https://i.imgur.com/RAA3sxi.png",
+                    "https://i.imgur.com/wOwoDc2.png",
+                    "https://i.imgur.com/g2kyGiM.png",
+                    "https://i.imgur.com/0ALtZyV.png"
+                ]
+            },
+            {
+                id: 'p5',
+                title: 'kaspar ludwig website',
+                layout: 'image',
+                link: 'https://testtestjodel.tumblr.com/',
+                images: ["https://i.imgur.com/28K0W8t.png"]
+            },
+            {
+                id: 'p6',
+                title: 'Maison Martin Margiela Photographed by Annie Leibovitz in 2008',
+                layout: 'image',
+                images: ["https://i.imgur.com/0EKmxDo.jpeg"]
+            },
+            {
+                id: 'p7', title: 'martin kippenberger - per pasta ad astra',
+                content: `
 <p>
 An edition made by Martin Kippenberger in 1989 for Kölnischer Kunstverein. It is named with the Latin phrase “Per aspera ad astra” (through hardships to the stars) in mind.
-</p><p>
+</p>
+<p>
 The box has three packs of pasta, some wooden beads and a spool of thread.
-</p><p>
+</p>
+<p>
 Pasta as way to refer to what is around painting. The space, the crowd, the food, the drinks – “the social pasta” – which was for him more important for painting than the paintings.
-</p><p>
+</p>
+<p>
 To think about this as a frame is nice.
-</p><p>
+</p>
+<p>
 When we say that Kippenberger was a “bad” painter, the word “bad” is itself framed by marks which makes it good.
 </p>
-`,
-images: [
-"https://i.imgur.com/Jl39NiN.jpeg",
-"https://i.imgur.com/eNLhWrb.jpeg"
-]
-},
-{
-id: 'p8', title: 'Lights Off',
-layout: 'image',
-images: ["https://i.imgur.com/e2ltRCk.jpeg",
-"https://i.imgur.com/Tbk9a8s.jpeg",
-"https://i.imgur.com/vEZU1OW.jpeg",
-"https://i.imgur.com/46rUoC4.jpeg",
-"https://i.imgur.com/g4ZkUMS.jpeg",
-"https://i.imgur.com/8vI9HI8.jpeg",
-"https://i.imgur.com/zDzHIZB.jpeg",
-"https://i.imgur.com/qjgZqmc.jpeg",
-"https://i.imgur.com/4oTOrUa.jpeg",
-"https://i.imgur.com/Hi6aYDb.jpeg"
-]
-},
-{
-id: 'p9', title: 'Kunsthaus Baselland',
-layout: 'image',
-images: [
-"https://i.imgur.com/75UayTB.jpg",
-"https://i.imgur.com/QaUtpvo.jpg",
-"https://i.imgur.com/vp48CNS.jpg",
-"https://i.imgur.com/oggEu6T.png"
-]
-},
-{
-id: 'p10',
-title: 'nothing',
-layout: 'image',
-link: 'no',
-images: ["no"]
-},
-{ id: 'p11', title: 'nothing', content: '<p></p><img src="" alt="">' },
-{ id: 'p12', title: 'nothing', content: '<p></p><img src="" alt="">' },
-{ id: 'p13', title: 'nothing', content: '<p></p><img src="" alt="">' },
-{ id: 'p14', title: 'nothing', content: '<p></p><img src="" alt="">' },
-{ id: 'p15', title: 'nothing', content: '<p></p><img src="">' }
-];
-function init() {
-loadPage('p1');
-}
-function loadPage(pageId) {
-const page = pages.find(p => p.id === pageId);
-if (!page) return;
-const container = document.getElementById('dynamic-content');
-let html = '';
-if (page.layout === 'image') {
-var imageHTML = page.link
-? '<a href="' + page.link + '" target="_blank" rel="noopener noreferrer" class="custom-tumblr-link">' +
-'<img src="' + page.images[0] + '" alt="">' +
-'</a>'
-: '<img src="' + page.images[0] + '" alt="">';
-html =
-'<article class="post image">' +
-'<div class="image-viewer">' +
-imageHTML +
-'</div>' +
-'</article>';
-} else if (page.layout === 'video') {
-html =
-'<article class="post video">' +
-'<div class="video-viewer">' +
-page.embed +
-'</div>' +
-'</article>';
-} else if (page.layout === 'text') {
-html =
-'<article class="post text">' +
-'<div class="text-post">' +
-page.content +
-'</div>' +
-'</article>';
-} else {
-html =
-'<article class="post split">' +
-'<div class="text-post">' +
-page.content +
-'</div>' +
-'<div class="image-viewer">' +
-(page.images ? '<img src="' + page.images[0] + '" alt="">' : '') +
-'</div>' +
-'</article>';
-}
-container.innerHTML = html;
-setupImageViewer(page.images || []);
-assignRandomLinks(pageId);
-}
-function setupImageViewer(images) {
-if (!images || images.length <= 1) return;
-const viewer = document.querySelector('.image-viewer');
-const img = viewer.querySelector('img');
-let index = 0;
-viewer.addEventListener('click', () => {
-index = (index + 1) % images.length;
-img.src = images[index];
-});
-}
-function assignRandomLinks(excludeId) {
-const available = pages.filter(p => p.id !== excludeId);
-for (let i = available.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-[available[i], available[j]] = [available[j], available[i]];
-}
-const selected = available.slice(0, 4);
-const positions = ['top', 'right', 'bottom', 'left'];
-positions.forEach((pos, index) => {
-if (selected[index]) {
-const el = document.getElementById('frame-' + pos);
-const page = selected[index];
-const label = el.querySelector('.label');
-label.textContent = page.title;
-el.title = page.title;
-el.onclick = (e) => {
-e.preventDefault();
-loadPage(page.id);
-};
-}
-});
-}
-window.addEventListener('DOMContentLoaded', init);
-</script><iframe scrolling="no" width="1" height="1" frameborder="0" style="background-color:transparent; overflow:hidden; position:absolute; top:0; left:0; z-index:9999;" id="ga_target"></iframe><script type="text/javascript">
-(function(){
-var analytics_frame = document.getElementById('ga_target');
-var analytics_iframe_loaded;
-var user_logged_in;
-var blog_is_nsfw = 'No';
-
-var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-var eventer = window[eventMethod];
-var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-eventer(messageEvent,function(e) {
-var message = (e.data && e.data.split) ? e.data.split(';') : '';
-switch (message[0]) {
-case 'analytics_iframe_loaded':
-analytics_iframe_loaded = true;
-postCSMessage();
-postGAMessage();
-break;
-case 'user_logged_in':
-user_logged_in = message[1];
-postGAMessage();
-break;
-}
-}, false);
-
-analytics_frame.src = "https://assets.tumblr.com/analytics.html?_v=9f5febfd57a8a649c598d888f2d9e062#" +
-"https://kunsthausbaselland.com";
-function postGAMessage() {
-if (analytics_iframe_loaded && user_logged_in) {
-var is_ajax = false;
-analytics_frame.contentWindow.postMessage(['tick_google_analytics', is_ajax, user_logged_in, blog_is_nsfw, '/?route=%2F'].join(';'), analytics_frame.src.split('/analytics.html')[0]);
-}
-}
-function postCSMessage() {
-COMSCORE = true;
-analytics_frame.contentWindow.postMessage('enable_comscore;' + window.location, analytics_frame.src.split('/analytics.html')[0]);
-}
-})();
-</script><script type="text/javascript" nonce="garZft97xpp4uZUMz9nwbxi2Y">!function(s){s.src='https://px.srvcs.tumblr.com/impixu?T=1770084300&J=eyJ0eXBlIjoidXJsIiwidXJsIjoiaHR0cDovL2t1bnN0aGF1c2Jhc2VsbGFuZC5jb20vIiwicmVxdHlwZSI6MCwicm91dGUiOiIvIn0=&U=LPNNHAGMMD&K=f1c4ece990ef3c84f65129ded904e5f3daa7bf7c107185c3aa31dbf0febbb5d8&R='.replace(/&R=[^&$]*/,'').concat('&R='+escape(document.referrer)).slice(0,2000).replace(/%.?.?$/,'');}(new Image());</script><noscript><img style="position:absolute;z-index:-3334;top:0px;left:0px;visibility:hidden;" src="https://px.srvcs.tumblr.com/impixu?T=1770084300&J=eyJ0eXBlIjoidXJsIiwidXJsIjoiaHR0cDovL2t1bnN0aGF1c2Jhc2VsbGFuZC5jb20vIiwicmVxdHlwZSI6MCwicm91dGUiOiIvIiwibm9zY3JpcHQiOjF9&U=LPNNHAGMMD&K=b9d8d2681d07d8d6d19693a5466583743055d46c673192b950b830a8225ab6cc&R="></noscript><iframe
-id="blue-space-api-calls-iframe"
-src="https://www.tumblr.com/dashboard/iframe/monetization?tumblelog=kunsthausbaselland&src=https%3A%2F%2Fkunsthausbaselland.com%2F"
-style="display: none;"
-sandbox="allow-scripts allow-same-origin"></iframe><script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js" crossorigin="anonymous" nonce="garZft97xpp4uZUMz9nwbxi2Y"></script><!--
-Open GAM console on the page:
-1. Open browser JS console
-2. Run `googletag.openConsole()`
-3. GAM debug UI should appear and tell some more info on the ad itself and its fulfillment status
-
-  </html> 
+  `,
+                images: [
+                    "https://i.imgur.com/Jl39NiN.jpeg",
+                    "https://i.imgur.com/eNLhWrb.jpeg"
+                ]
+            },
+            {
+                id: 'p8', title: 'Lights Off',
+                layout: 'image',
+                images: ["https://i.imgur.com/e2ltRCk.jpeg",
+                    "https://i.imgur.com/Tbk9a8s.jpeg",
+                    "https://i.imgur.com/vEZU1OW.jpeg",
+                    "https://i.imgur.com/46rUoC4.jpeg",
+                    "https://i.imgur.com/g4ZkUMS.jpeg",
+                    "https://i.imgur.com/8vI9HI8.jpeg",
+                    "https://i.imgur.com/zDzHIZB.jpeg",
+                    "https://i.imgur.com/qjgZqmc.jpeg",
+                    "https://i.imgur.com/4oTOrUa.jpeg",
+                    "https://i.imgur.com/Hi6aYDb.jpeg"
+                ]
+            },
+            {
+                id: 'p9', title: 'Kunsthaus Baselland',
+                layout: 'image',
+                images: [
+                    "https://i.imgur.com/75UayTB.jpg",
+                    "https://i.imgur.com/QaUtpvo.jpg",
+                    "https://i.imgur.com/vp48CNS.jpg",
+                    "https://i.imgur.com/oggEu6T.png"
+                ]
+            },
+            {
+                id: 'p10',
+                title: 'Tao Lin Reading',
+                layout: 'image',
+                link: 'https://www.youtube.com/watch?v=QjcOK2T0lPo',
+                images: ["https://img.youtube.com/vi/QjcOK2T0lPo/hqdefault.jpg"]
+            },
+            { id: 'p11', title: 'nothing', content: '<p>Books containing stories that never happened.</p><img src="https://via.placeholder.com/500x350/8B4513/FFFFFF?text=Lost+Library" alt="Library">' },
+            { id: 'p12', title: 'nothing', content: '<p>Hello... hello... hello...</p><img src="https://via.placeholder.com/500x350/333333/FFFFFF?text=Echo+Chamber" alt="Echo">' },
+            { id: 'p13', title: 'nothing', content: '<p>Burning bright with intense energy.</p><img src="https://via.placeholder.com/500x350/FF4500/FFFFFF?text=Solar+Flare" alt="Sun">' },
+            { id: 'p14', title: 'nothing', content: '<p>Pale reflections on a calm lake.</p><img src="https://via.placeholder.com/500x350/C0C0C0/000000?text=Moonlight" alt="Moon">' },
+            { id: 'p15', title: 'nothing', content: '<p>Nothing is here but potential.</p><img src="https://via.placeholder.com/500x350/000000/FFFFFF?text=The+Void" alt="Void">' }
+        ];
+        function init() {
+            loadPage('p1');
+        }
+        function loadPage(pageId) {
+            const page = pages.find(p => p.id === pageId);
+            if (!page) return;
+            const container = document.getElementById('dynamic-content');
+            let html = '';
+            if (page.layout === 'image') {
+                var imageHTML = page.link
+                    ? '<a href="' + page.link + '" target="_blank" rel="noopener noreferrer" class="custom-tumblr-link">' +
+                    '<img src="' + page.images[0] + '" alt="">' +
+                    '</a>'
+                    : '<img src="' + page.images[0] + '" alt="">';
+                html =
+                    '<article class="post image">' +
+                    '<div class="image-viewer">' +
+                    imageHTML +
+                    '</div>' +
+                    '</article>';
+            } else if (page.layout === 'video') {
+                html =
+                    '<article class="post video">' +
+                    '<div class="video-viewer">' +
+                    page.embed +
+                    '</div>' +
+                    '</article>';
+            } else if (page.layout === 'text') {
+                html =
+                    '<article class="post text">' +
+                    '<div class="text-post">' +
+                    page.content +
+                    '</div>' +
+                    '</article>';
+            } else {
+                html =
+                    '<article class="post split">' +
+                    '<div class="text-post">' +
+                    page.content +
+                    '</div>' +
+                    '<div class="image-viewer">' +
+                    (page.images ? '<img src="' + page.images[0] + '" alt="">' : '') +
+                    '</div>' +
+                    '</article>';
+            }
+            container.innerHTML = html;
+            setupImageViewer(page.images || []);
+            assignRandomLinks(pageId);
+        }
+        function setupImageViewer(images) {
+            if (!images || images.length <= 1) return;
+            const viewer = document.querySelector('.image-viewer');
+            const img = viewer.querySelector('img');
+            let index = 0;
+            viewer.addEventListener('click', () => {
+                index = (index + 1) % images.length;
+                img.src = images[index];
+            });
+        }
+        function assignRandomLinks(excludeId) {
+            const available = pages.filter(p => p.id !== excludeId);
+            for (let i = available.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [available[i], available[j]] = [available[j], available[i]];
+            }
+            const selected = available.slice(0, 4);
+            const positions = ['top', 'right', 'bottom', 'left'];
+            positions.forEach((pos, index) => {
+                if (selected[index]) {
+                    const el = document.getElementById('frame-' + pos);
+                    const page = selected[index];
+                    const label = el.querySelector('.label');
+                    label.textContent = page.title;
+                    el.title = page.title;
+                    el.onclick = (e) => {
+                        e.preventDefault();
+                        loadPage(page.id);
+                    };
+                }
+            });
+        }
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
