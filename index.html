@@ -9,16 +9,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
     <style>
-        /* --- HIDE TUMBLR UI / LINKS --- */
+        /* --- HIDE TUMBLR UI / Links --- */
         a.custom-tumblr-link {
             display: inline !important;
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto !important;
             color: blue;
-            /* or black if you want */
             text-decoration: underline;
-            /* optional */
         }
         iframe.tmblr-iframe,
         .tmblr-iframe,
@@ -47,7 +45,6 @@
         }
         :root {
             --frame-thickness: 55px;
-            /* Keeping the same thickness for interaction area */
             --border-color: #000000;
             --bg-color: #ffffff;
             --text-color: #0000FF;
@@ -88,14 +85,10 @@
         .frame-side .label:visited {
             color: black !important;
         }
-        /* 
-           FRAME STYLING (MINIMAL BLACK LINES)
-           We remove the wood texture and replace it with simple black borders.
-        */
+        /* FRAME STYLING */
         .frame-side {
             position: fixed;
             background-color: white;
-            /* No Border - lines are drawn by visual layer */
             border: none;
             display: flex;
             justify-content: center;
@@ -103,10 +96,6 @@
             z-index: 1000;
             box-sizing: border-box;
         }
-        /* 
-           Visual Layer for Diagonal Joints 
-           Since clip-path cuts off borders at the diagonals, we draw specific lines.
-        */
         .frame-visuals {
             position: fixed;
             top: 0;
@@ -115,7 +104,6 @@
             height: 100%;
             pointer-events: none;
             z-index: 1002;
-            /* Above frame sides */
         }
         .outer-rect {
             position: absolute;
@@ -137,17 +125,9 @@
             position: absolute;
             background-color: black;
             height: 2px;
-            /* 
-               Width = distance from outer corner to inner corner = thickness * sqrt(2) 
-               55 * 1.414 = 77.78px.
-               Set to 77.5px to bridge the gap perfectly without overshooting visually.
-            */
             width: 77.8px;
             transform-origin: 0 50%;
         }
-        /* 
-           Positioning corners at the "inset" point where bars meet.
-        */
         .corner-tl {
             top: var(--frame-inset);
             left: var(--frame-inset);
@@ -168,16 +148,13 @@
             left: calc(100% - var(--frame-inset));
             transform: rotate(-135deg);
         }
-        /* TOP */
         .frame-top {
             top: var(--frame-inset);
             left: var(--frame-inset);
             right: var(--frame-inset);
             height: var(--frame-thickness);
-            /* Mitered visual using clip-path */
             clip-path: polygon(0% 0%, 100% 0%, calc(100% - var(--frame-thickness) + 1px) 100%, calc(var(--frame-thickness) - 1px) 100%);
         }
-        /* BOTTOM */
         .frame-bottom {
             bottom: var(--frame-inset);
             left: var(--frame-inset);
@@ -185,7 +162,6 @@
             height: var(--frame-thickness);
             clip-path: polygon(calc(var(--frame-thickness) - 1px) 0%, calc(100% - var(--frame-thickness) + 1px) 0%, 100% 100%, 0% 100%);
         }
-        /* LEFT */
         .frame-left {
             top: var(--frame-inset);
             bottom: var(--frame-inset);
@@ -193,7 +169,6 @@
             width: var(--frame-thickness);
             clip-path: polygon(0% 0%, 100% calc(var(--frame-thickness) - 1px), 100% calc(100% - var(--frame-thickness) + 1px), 0% 100%);
         }
-        /* RIGHT */
         .frame-right {
             top: var(--frame-inset);
             bottom: var(--frame-inset);
@@ -201,13 +176,10 @@
             width: var(--frame-thickness);
             clip-path: polygon(0% calc(var(--frame-thickness) - 1px), 100% 0%, 100% 100%, 0% calc(100% - var(--frame-thickness) + 1px));
         }
-        /* Label Styling */
         .frame-side .label {
             color: black !important;
             white-space: nowrap;
-            /* ← key change */
             max-width: none;
-            /* ← remove artificial constraint */
             line-height: 1;
             text-align: center;
             position: relative;
@@ -220,7 +192,6 @@
         }
         .frame-side:hover {
             background-color: #f0f0f0;
-            /* Slight grey on hover to indicate clickable */
         }
         .frame-left .label {
             transform: rotate(-90deg);
@@ -228,22 +199,26 @@
         .frame-right .label {
             transform: rotate(90deg);
         }
-        /* Content Styling */
         .content {
             font-size: 25px;
             position: relative;
             text-align: center;
-            /* Adjusted width to account for frame */
             width: calc(100% - 2 * (var(--frame-inset) + var(--frame-thickness) + 20px));
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            /* Content Typography: Baskerville in Black */
             font-family: 'Baskerville', 'Times New Roman', serif;
             color: black;
+            top: calc(var(--frame-inset) + var(--frame-thickness));
+            left: calc(var(--frame-inset) + var(--frame-thickness));
+            right: calc(var(--frame-inset) + var(--frame-thickness));
+            bottom: calc(var(--frame-inset) + var(--frame-thickness));
+            position: absolute;
+            overflow: hidden;
+            align-items: stretch;
+            justify-content: stretch;
         }
-        /* Ensure ALL text in content is black and NO underlines */
         .content p,
         .content h1,
         .content h2,
@@ -252,20 +227,6 @@
         .content a {
             color: black;
             text-decoration: none;
-        }
-        /* Links inside content remain black (no blue), no underline as requested */
-        .content {
-            position: absolute;
-            top: calc(var(--frame-inset) + var(--frame-thickness));
-            left: calc(var(--frame-inset) + var(--frame-thickness));
-            right: calc(var(--frame-inset) + var(--frame-thickness));
-            bottom: calc(var(--frame-inset) + var(--frame-thickness));
-            overflow: hidden;
-            display: flex;
-            align-items: stretch;
-            justify-content: stretch;
-            font-family: 'helvetica', 'Times New Roman', serif;
-            color: black;
         }
         .posts-wrapper {
             position: relative;
@@ -286,7 +247,6 @@
             align-items: stretch;
             pointer-events: auto;
         }
-        /* SPLIT LAYOUT TEXT SCROLL */
         .post.split .text-post {
             height: 100%;
             overflow-y: auto;
@@ -296,7 +256,6 @@
         }
         .post.split .text-post::-webkit-scrollbar {
             display: none;
-            /* Chrome / Safari */
         }
         .post.split .image-viewer {
             width: 100%;
@@ -310,7 +269,6 @@
             max-height: 100%;
             object-fit: contain;
         }
-        /* FULL IMAGE */
         .post.image {
             display: flex;
             align-items: center;
@@ -337,15 +295,12 @@
             height: 100%;
             object-fit: contain;
         }
-        /* FULL TEXT */
         .post.text {
             display: block;
             padding: 60px;
             text-align: left;
             font-size: 35px;
-            /* ← adjust this */
             line-height: 1.5;
-            /* optional but strongly recommended */
         }
         .post.text .text-post {
             height: 100%;
@@ -355,7 +310,6 @@
         .post.text .text-post::-webkit-scrollbar {
             display: none;
         }
-        /* FULL VIDEO */
         .post.video {
             display: flex;
             align-items: center;
@@ -373,12 +327,10 @@
         .post.video iframe {
             max-width: 100%;
             max-height: 100%;
-            /* Keep aspect ratio if possible, but contained */
             aspect-ratio: 16 / 9;
             width: 100%;
             height: auto;
         }
-        /* If the screen is too wide (wider than 16:9), height is 100% and width auto */
         @media (min-aspect-ratio: 16/9) {
             .post.video iframe {
                 height: 100%;
@@ -388,18 +340,14 @@
     </style>
 </head>
 <body>
-    <!-- Visual Layer (Draws the diagonal lines) -->
     <div class="frame-visuals">
-        <!-- New Wireframe Rectangles -->
         <div class="outer-rect"></div>
         <div class="inner-rect"></div>
-        <!-- Diagonal Joints -->
         <div class="corner-line corner-tl"></div>
         <div class="corner-line corner-tr"></div>
         <div class="corner-line corner-bl"></div>
         <div class="corner-line corner-br"></div>
     </div>
-    <!-- Interaction Layer (Clickable Zones) -->
     <a href="#" class="frame-side frame-top" id="frame-top">
         <span class="label">Loading...</span>
     </a>
@@ -412,27 +360,24 @@
     <a href="#" class="frame-side frame-left" id="frame-left">
         <span class="label">Loading...</span>
     </a>
-    <!-- Main Content -->
     <main class="content">
         <div class="posts-wrapper" id="dynamic-content">
-            <!-- Content will be injected here by JS -->
         </div>
     </main>
     <script>
-        // --- Random Navigation System (COPIED FROM ORIGINAL) ---
         const pages = [
-            // --- USER VIDEO EXAMPLE (PLACEHOLDER) ---
-            // Replace the 'embed' string with your YouTube embed code
             {
                 id: 'p15',
                 title: 'Tao Lin – The Next Night We Ate Whale',
                 layout: 'video',
                 embed: '<iframe width="560" height="315" src="https://www.youtube.com/embed/QjcOK2T0lPo?si=EXAMPLE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
-            },            {
+            },
+            {
                 id: 'p16',
                 title: 'Purecore',
                 layout: 'video',
-                embed: '<iframe width="560" height="315" src="https://www.youtube.com/embed/M0cW4NlXsrs?si=TgLbGpg5vbIge7XQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                // ERROR 1 FIXED: Added closing single quote here -->
+                embed: '<iframe width="560" height="315" src="https://www.youtube.com/embed/M0cW4NlXsrs?si=TgLbGpg5vbIge7XQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             },
             {
                 id: 'p1',
@@ -499,8 +444,7 @@ For Rick Owens, the frame, which outside of painting means the body, the thing t
 It seems that the modernist “refusal” of the frame is in a sense a refusal to get over itself. Of course fashion has an advantage. Fashion believes no one will care in a hundred years. True or not.
 </p>
 `
-            }
-            ,
+            },
             {
                 id: 'p4',
                 title: 'THE HOLE WORLD',
@@ -624,7 +568,7 @@ When we say that Kippenberger was a “bad” painter, the word “bad” is its
                 link: 'https://www.youtube.com/watch?v=QjcOK2T0lPo',
                 images: ["https://img.youtube.com/vi/QjcOK2T0lPo/hqdefault.jpg"]
             },
-                        {
+            {
                 id: 'p11',
                 title: 'In the world everything is as it is and happens as it does happen.',
                 layout: 'text',
@@ -663,9 +607,8 @@ When we say that Kippenberger was a “bad” painter, the word “bad” is its
         represent. These seem like good things to think about when we try to frame a painting exhibition as political.
     </p>
 `
-            }
-            ,
-                        {
+            },
+            {
                 id: 'p12', title: 'Picture–Picture',
                 layout: 'image',
                 images: ["https://i.imgur.com/S2ulstx.jpg",
@@ -680,7 +623,8 @@ When we say that Kippenberger was a “bad” painter, the word “bad” is its
                     "https://i.imgur.com/t6xnIDU.jpg"
                 ]
             },
-            { id: 'p13',  title: 'The Brand',
+            { 
+                id: 'p13',  title: 'The Brand',
                 layout: 'text',
                 content: `
 <p>
@@ -695,9 +639,9 @@ If there is such a thing as a brand (a kind of unifying quality that makes your 
 I’d like to think that this disorganized and varied way of painting that I have is a kind of test of this faith and the idea of brand.
 </p>
 `
-            }
-            ,
-            { id: 'p14', title: 'Giftshop',
+            },
+            { 
+                id: 'p14', title: 'Giftshop',
                 layout: 'image',
                 images: ["https://i.imgur.com/UB9Od5F.png",
                     "https://i.imgur.com/CvIVqm0.jpg",
@@ -711,7 +655,8 @@ I’d like to think that this disorganized and varied way of painting that I hav
                     "https://i.imgur.com/yilKfOJ.jpg"
                 ]
             }
-           
+        ]; // ERROR 2 FIXED: Added closing bracket and semicolon here -->
+
         function init() {
             loadPage('p1');
         }
